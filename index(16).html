@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<!-- saved from url=(0045)file:///C:/Users/admin/Downloads/index_3.html -->
+<html lang="de"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Meine Imkerei</title>
+<meta name="theme-color" content="#1D9E75">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root {
+  --green: #1D9E75;
+  --green-dark: #0F6E56;
+  --green-light: #E6F7F2;
+  --red: #FF3B30;
+  --orange: #B45309;
+  --bg: #F5F5F5;
+  --bg2: #FFFFFF;
+  --border: #E0E0E0;
+  --text: #1A1A1A;
+  --text2: #666666;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1C1C1E;
+    --bg2: #2C2C2E;
+    --border: #3A3A3C;
+    --text: #F2F2F7;
+    --text2: #8E8E93;
+    --green-light: #0D3D2E;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* SYNC STATUS */
+#sync-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 3px; background: var(--green); transform: scaleX(0); transform-origin: left; transition: transform 0.3s; }
+#sync-bar.syncing { transform: scaleX(0.7); }
+#sync-bar.done { transform: scaleX(1); transition: transform 0.2s; }
+#sync-indicator { position: fixed; top: 8px; right: 12px; z-index: 1001; font-size: 11px; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.sync-dot.offline { background: #FF9500; }
+.sync-dot.error { background: var(--red); }
+
+/* LAYOUT */
+.app { max-width: 680px; margin: 0 auto; padding: 0 0 80px; }
+.header { padding: 52px 16px 12px; background: var(--bg2); border-bottom: 0.5px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.header-title { display: flex; align-items: center; gap: 10px; }
+.header-title h1 { font-size: 20px; font-weight: 600; }
+.subtitle { font-size: 13px; color: var(--text2); }
+
+/* TABS */
+.tabs { display: flex; gap: 4px; background: var(--bg); border-radius: 10px; padding: 3px; }
+.tab { flex: 1; padding: 8px 4px; border: none; background: transparent; font-family: inherit; font-size: 13px; color: var(--text2); border-radius: 8px; cursor: pointer; transition: all 0.15s; font-weight: 500; }
+.tab.active { background: var(--bg2); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+
+/* SECTIONS */
+.section { display: none; padding: 12px 16px; }
+.section.active { display: block; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.section-title { font-size: 16px; font-weight: 600; }
+
+/* BUTTONS */
+.btn-primary { background: var(--green); color: white; border: none; font-size: 14px; padding: 9px 16px; border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; font-weight: 600; }
+.btn-sm { font-size: 12px; padding: 5px 9px; border: 1px solid var(--border); background: var(--bg2); border-radius: 6px; cursor: pointer; color: var(--text2); font-family: inherit; }
+
+/* CARDS */
+.card { background: var(--bg2); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; border: 0.5px solid var(--border); }
+
+/* BADGE */
+.badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; display: inline-block; }
+.badge-ok { background: #EAF3DE; color: #27500A; }
+.badge-warn { background: #FAEEDA; color: #633806; }
+.badge-danger { background: #FCEBEB; color: #791F1F; }
+.badge-urgent { background: var(--red); color: white; font-size: 10px; padding: 2px 6px; }
+
+/* STANDORT */
+.standort-card { background: var(--bg2); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; border: 0.5px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.15s; }
+.standort-card:active { background: var(--bg); }
+.standort-left { display: flex; align-items: center; gap: 12px; }
+.standort-icon { width: 42px; height: 42px; border-radius: 50%; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.standort-name { font-size: 15px; font-weight: 600; }
+.standort-meta { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+/* BREADCRUMB */
+.breadcrumb { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+.bc-link { font-size: 14px; color: var(--green); cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
+.bc-sep { color: var(--text2); font-size: 14px; }
+.bc-current { font-size: 14px; font-weight: 600; }
+
+/* VOLK-ZEILE */
+.hive-row { padding: 12px 8px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; border-radius: var(--radius-sm); transition: background 0.1s; user-select: none; -webkit-user-select: none; }
+.hive-row:last-child { border-bottom: none; }
+.hive-row:active { background: var(--bg); }
+.hive-row.selected { background: var(--green-light); }
+.select-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: none; align-items: center; justify-content: center; background: var(--bg2); transition: all 0.15s; }
+.select-mode .select-circle { display: flex; }
+.hive-row.selected .select-circle { background: var(--green); border-color: var(--green); }
+.hive-row.selected .select-circle::after { content:''; width:10px; height:7px; border-left:2px solid white; border-bottom:2px solid white; transform:rotate(-45deg) translateY(-1px); display:block; }
+.hive-info { flex: 1; min-width: 0; }
+.hive-name { font-size: 14px; font-weight: 600; }
+.hive-sub { font-size: 12px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* AUSWAHL-BANNER */
+.selection-banner { background: var(--green); color: white; padding: 10px 16px; border-radius: var(--radius-sm); margin-bottom: 10px; display: none; align-items: center; justify-content: space-between; }
+.selection-banner.show { display: flex; }
+.selection-count { font-size: 14px; font-weight: 600; }
+.selection-hint { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+.banner-cancel { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 12px; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-family: inherit; }
+
+/* MASSENAKTIONEN */
+.mass-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-top: 0.5px solid var(--border); padding: 10px 16px 24px; display: none; z-index: 150; max-width: 680px; margin: 0 auto; }
+.mass-bar.show { display: block; }
+.mass-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.mass-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border: 0.5px solid var(--border); border-radius: var(--radius-sm); background: var(--bg2); cursor: pointer; font-family: inherit; }
+.mass-btn:active { background: var(--bg); }
+.mass-btn-icon { font-size: 22px; }
+.mass-btn-label { font-size: 11px; font-weight: 600; color: var(--text); text-align: center; }
+
+/* TASKS */
+.task-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 0.5px solid var(--border); }
+.task-item:last-child { border-bottom: none; }
+.task-item.urgent-stripe { border-left: 3px solid var(--red); padding-left: 10px; }
+.task-check { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 5px; cursor: pointer; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; }
+.task-check.done { background: var(--green); border-color: var(--green); }
+.task-check.done::after { content:''; width:9px; height:6px; border-left:2px solid white; border-bottom:2px solid white; transform:rotate(-45deg) translateY(-1px); display:block; }
+.task-body { flex: 1; min-width: 0; }
+.task-text { font-size: 14px; line-height: 1.4; }
+.task-text.done { text-decoration: line-through; color: var(--text2); }
+.task-meta { font-size: 11px; color: var(--text2); margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.due-pill { font-size: 11px; padding: 2px 7px; border-radius: 4px; font-weight: 500; }
+.due-ok { background: #EAF3DE; color: #27500A; }
+.due-soon { background: #FAEEDA; color: #633806; }
+.due-over { background: #FCEBEB; color: #791F1F; }
+.task-group-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 0 4px; font-weight: 600; }
+
+/* FILTER */
+.filter-bar { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.filter-chip { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg2); cursor: pointer; font-family: inherit; color: var(--text2); font-weight: 500; }
+.filter-chip.active { background: var(--green); color: white; border-color: var(--green); }
+
+/* SHEET */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; }
+.overlay.open { display: block; }
+.sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-radius: 20px 20px 0 0; padding: 0 16px 32px; z-index: 201; transform: translateY(100%); transition: transform 0.28s cubic-bezier(0.32,0.72,0,1); max-width: 680px; margin: 0 auto; }
+.sheet.open { transform: translateY(0); }
+.sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 4px; }
+.sheet-title { font-size: 13px; color: var(--text2); text-align: center; padding: 4px 0 14px; font-weight: 500; }
+.sheet-action { display: flex; align-items: center; gap: 14px; padding: 15px 4px; border-bottom: 0.5px solid var(--border); cursor: pointer; border-radius: var(--radius-sm); transition: background 0.1s; }
+.sheet-action:last-child { border-bottom: none; }
+.sheet-action:active { background: var(--bg); }
+.sheet-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.sheet-label { font-size: 15px; font-weight: 600; }
+.sheet-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.sheet-danger .sheet-label { color: #C0392B; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 16px 0 32px; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg2); border-radius: var(--radius); padding: 20px 18px; width: 93%; max-width: 440px; margin: auto; }
+.modal-title { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
+.modal-subtitle { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+.form-row { margin-bottom: 14px; }
+.form-label { font-size: 11px; color: var(--text2); margin-bottom: 5px; display: block; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.form-input { width: 100%; font-size: 15px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--bg2); color: var(--text); font-family: inherit; }
+.form-input:focus { outline: none; border-color: var(--green); }
+textarea.form-input { resize: vertical; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-divider { height: 0.5px; background: var(--border); margin: 16px 0; }
+.form-section { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; font-weight: 600; }
+
+/* TOGGLE JA/NEIN */
+.toggle-group { display: flex; border: 1.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.toggle-btn { flex: 1; padding: 9px; border: none; background: transparent; font-family: inherit; font-size: 14px; color: var(--text2); cursor: pointer; font-weight: 500; }
+.toggle-btn.active-ja { background: #EAF3DE; color: #27500A; font-weight: 700; }
+.toggle-btn.active-nein { background: #FCEBEB; color: #791F1F; font-weight: 700; }
+
+/* FUTTER */
+.futter-group { display: flex; border: 1.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.futter-btn { flex: 1; padding: 9px; border: none; background: transparent; font-family: inherit; font-size: 15px; color: var(--text2); cursor: pointer; font-weight: 700; }
+.futter-btn.active-minus { background: #FCEBEB; color: #791F1F; }
+.futter-btn.active-null { background: #FAEEDA; color: #633806; }
+.futter-btn.active-plus { background: #EAF3DE; color: #27500A; }
+
+/* CHECKBOXEN */
+.check-group { display: flex; flex-direction: column; gap: 6px; }
+.check-item { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 8px 10px; border-radius: var(--radius-sm); transition: background 0.1s; }
+.check-item:active { background: var(--bg); }
+.check-box { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.check-box.checked { background: var(--green); border-color: var(--green); }
+.check-box.checked::after { content:''; width:10px; height:7px; border-left:2px solid white; border-bottom:2px solid white; transform:rotate(-45deg) translateY(-1px); display:block; }
+.check-label { font-size: 14px; font-weight: 500; }
+.weisel-detail { margin-top: 8px; margin-left: 30px; padding: 10px 12px; background: var(--bg); border-radius: var(--radius-sm); display: none; }
+.weisel-detail.show { display: block; }
+
+/* SPEZIALFELDER */
+.input-bienen { border-color: #A5D6A7 !important; background: #F1F8F1 !important; }
+.input-varroa { border-color: #FFAB91 !important; background: #FFF5F2 !important; }
+.label-bienen { color: #27500A !important; }
+.label-varroa { color: #7B3A28 !important; }
+.input-hint { font-size: 11px; margin-top: 4px; color: var(--text2); }
+
+/* DRINGEND */
+.urgent-toggle { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); cursor: pointer; }
+.urgent-toggle.active { border-color: var(--red); background: #FFF2F2; }
+.urgent-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; }
+.urgent-toggle.active .urgent-dot { background: var(--red); border-color: var(--red); }
+.urgent-lbl { font-size: 14px; font-weight: 500; }
+.urgent-toggle.active .urgent-lbl { color: #C0392B; font-weight: 700; }
+
+/* MULTI-INFO */
+.multi-info { background: var(--green-light); border: 1px solid var(--green); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 13px; color: var(--green-dark); margin-bottom: 14px; display: none; }
+
+/* LOADING */
+#loading { position: fixed; inset: 0; background: var(--bg2); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; }
+#loading .bee { font-size: 48px; animation: bob 1s ease-in-out infinite alternate; }
+@keyframes bob { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+#loading p { font-size: 15px; color: var(--text2); }
+
+.empty-state { text-align: center; padding: 32px 16px; color: var(--text2); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div id="loading" style="display: none;"><div class="bee">🐝</div><p id="loading-msg">Daten werden geladen…</p><p id="loading-hint" style="font-size:12px;color:#aaa;margin-top:8px;display:none;">Prüfe die Firestore-Regeln in der Firebase Console</p></div>
+<div id="sync-bar" class=""></div>
+<div id="sync-indicator"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Verbunden</span></div>
+
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-title">
+        <span style="font-size:26px;">🐝</span>
+        <div>
+          <h1>Meine Imkerei</h1>
+          <div class="subtitle" id="subtitle">0 Volker · 0 Standorte</div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab(&#39;voelker&#39;,this)">📍 Standorte</button>
+      <button class="tab" onclick="showTab(&#39;aufgaben&#39;,this)">✓ Aufgaben</button>
+    </div>
+  </div>
+
+  <!-- VÖLKER -->
+  <div id="tab-voelker" class="section active">
+    <div id="view-standorte">
+      <div class="section-header">
+        <span class="section-title" id="standorte-title">Standorte (0)</span>
+        <button class="btn-primary" onclick="openModal(&#39;modal-addstandort&#39;)">+ Standort</button>
+      </div>
+      <div id="standorte-list"><div class="empty-state">Noch keine Standorte angelegt.<br><br>Tippe auf „+ Standort" um loszulegen.</div></div>
+    </div>
+    <div id="view-detail" style="display:none;">
+      <div class="breadcrumb">
+        <button class="bc-link" onclick="cancelSelect();showStandortList()">Standorte</button>
+        <span class="bc-sep">›</span>
+        <span class="bc-current" id="bc-name"></span>
+      </div>
+      <div class="selection-banner" id="sel-banner">
+        <div><div class="selection-count" id="sel-count">0 ausgewählt</div><div class="selection-hint">Weitere antippen zum Hinzufügen</div></div>
+        <button class="banner-cancel" onclick="cancelSelect()">Abbrechen</button>
+      </div>
+      <div class="section-header">
+        <span class="section-title" id="detail-title"></span>
+        <button class="btn-primary" onclick="openAddVolkHere()">+ Volk</button>
+      </div>
+      <div class="card"><div id="voelker-list"></div></div>
+    </div>
+  </div>
+
+  <!-- AUFGABEN -->
+  <div id="tab-aufgaben" class="section">
+    <div class="section-header">
+      <span class="section-title" id="aufgaben-title">Aufgaben</span>
+      <button class="btn-primary" onclick="openAufgabeModal([])">+ Aufgabe</button>
+    </div>
+    <div class="filter-bar" id="filter-bar"><button class="filter-chip active" onclick="setFilter(&#39;alle&#39;)">Alle</button></div>
+    <div class="card"><div id="aufgaben-list"><div class="empty-state">Keine Aufgaben vorhanden.</div></div></div>
+  </div>
+</div>
+
+<!-- MASSENAKTIONS-LEISTE -->
+<div class="mass-bar" id="mass-bar">
+  <div class="mass-grid">
+    <button class="mass-btn" onclick="massAction(&#39;inspektion&#39;)"><span class="mass-btn-icon">🔍</span><span class="mass-btn-label">Inspektion</span></button>
+    <button class="mass-btn" onclick="massAction(&#39;varroa&#39;)"><span class="mass-btn-icon">💊</span><span class="mass-btn-label">Varroa</span></button>
+    <button class="mass-btn" onclick="massAction(&#39;ernte&#39;)"><span class="mass-btn-icon">🍯</span><span class="mass-btn-label">Ernte</span></button>
+    <button class="mass-btn" onclick="massAction(&#39;fuetterung&#39;)"><span class="mass-btn-icon">🥣</span><span class="mass-btn-label">Fütterung</span></button>
+    <button class="mass-btn" onclick="massAction(&#39;aufgabe&#39;)"><span class="mass-btn-icon">✓</span><span class="mass-btn-label">Aufgabe</span></button>
+    <button class="mass-btn" onclick="massAction(&#39;verschieben&#39;)"><span class="mass-btn-icon">📦</span><span class="mass-btn-label">Verschieben</span></button>
+  </div>
+</div>
+
+<!-- EINZEL-SHEET -->
+<div class="overlay" id="sheet-overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="action-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="sheet-title"></div>
+  <div class="sheet-action" onclick="sheetDo(&#39;inspektion&#39;)"><div class="sheet-icon" style="background:#E8F5E9;">🔍</div><div><div class="sheet-label">Inspektion</div><div class="sheet-sub">Königin, Brut, Varroa…</div></div></div>
+  <div class="sheet-action" onclick="sheetDo(&#39;varroa&#39;)"><div class="sheet-icon" style="background:#FFF3E0;">💊</div><div><div class="sheet-label">Varroa-Behandlung</div></div></div>
+  <div class="sheet-action" onclick="sheetDo(&#39;ernte&#39;)"><div class="sheet-icon" style="background:#FFFDE7;">🍯</div><div><div class="sheet-label">Honigernte</div></div></div>
+  <div class="sheet-action" onclick="sheetDo(&#39;fuetterung&#39;)"><div class="sheet-icon" style="background:#E3F2FD;">🥣</div><div><div class="sheet-label">Fütterung</div></div></div>
+  <div class="sheet-action" onclick="sheetDo(&#39;aufgabe&#39;)"><div class="sheet-icon" style="background:#F3E5F5;">✓</div><div><div class="sheet-label">Aufgabe</div></div></div>
+  <div class="sheet-action" onclick="sheetDo(&#39;verschieben&#39;)"><div class="sheet-icon" style="background:#E8EAF6;">📦</div><div><div class="sheet-label">Volk verschieben</div></div></div>
+  <div class="sheet-action sheet-danger" onclick="sheetDo(&#39;loeschen&#39;)"><div class="sheet-icon" style="background:#FFEBEE;">🗑</div><div><div class="sheet-label">Volk entfernen</div></div></div>
+</div>
+
+<!-- MODAL: INSPEKTION -->
+<div class="modal-overlay" id="modal-inspektion">
+  <div class="modal">
+    <div class="modal-title">🔍 Inspektion</div>
+    <div class="modal-subtitle" id="insp-sub"></div>
+    <div class="multi-info" id="insp-multi"></div>
+    <div class="form-section">Königin</div>
+    <div class="form-row"><label class="form-label">Königin gesehen?</label><div class="toggle-group" id="tg-koenigin"><button class="toggle-btn" onclick="tog(&#39;koenigin&#39;,&#39;ja&#39;)">✓ Ja</button><button class="toggle-btn" onclick="tog(&#39;koenigin&#39;,&#39;nein&#39;)">✗ Nein</button></div></div>
+    <div class="form-row"><label class="form-label">Stifte / Eier gesehen?</label><div class="toggle-group" id="tg-stifte"><button class="toggle-btn" onclick="tog(&#39;stifte&#39;,&#39;ja&#39;)">✓ Ja</button><button class="toggle-btn" onclick="tog(&#39;stifte&#39;,&#39;nein&#39;)">✗ Nein</button></div></div>
+    <div class="form-row"><label class="form-label">Weiselzelle vorhanden?</label><div class="toggle-group" id="tg-weisel"><button class="toggle-btn" onclick="tog(&#39;weisel&#39;,&#39;ja&#39;)">✓ Ja</button><button class="toggle-btn" onclick="tog(&#39;weisel&#39;,&#39;nein&#39;)">✗ Nein</button></div>
+      <div class="weisel-detail" id="weisel-detail"><label class="form-label" style="margin-bottom:6px;">Verdeckelt?</label><div class="toggle-group" id="tg-weiselv"><button class="toggle-btn" onclick="tog(&#39;weiselv&#39;,&#39;ja&#39;)">✓ Ja</button><button class="toggle-btn" onclick="tog(&#39;weiselv&#39;,&#39;nein&#39;)">✗ Nein</button></div></div>
+    </div>
+    <div class="form-divider"></div>
+    <div class="form-section">Brut &amp; Raum</div>
+    <div class="form-row"><label class="form-label">Drohnenbrut geschnitten?</label><div class="toggle-group" id="tg-drohne"><button class="toggle-btn" onclick="tog(&#39;drohne&#39;,&#39;ja&#39;)">✓ Ja</button><button class="toggle-btn" onclick="tog(&#39;drohne&#39;,&#39;nein&#39;)">✗ Nein</button></div></div>
+    <div class="form-row"><label class="form-label">Eingriffe (Mehrfach möglich)</label>
+      <div class="check-group">
+        <div class="check-item" onclick="togCb(&#39;honigraum&#39;)"><div class="check-box" id="cb-honigraum"></div><span class="check-label">Honigraum aufgesetzt</span></div>
+        <div class="check-item" onclick="togCb(&#39;brutraum&#39;)"><div class="check-box" id="cb-brutraum"></div><span class="check-label">Brutraum aufgesetzt</span></div>
+        <div class="check-item" onclick="togCb(&#39;drohnenrahmen&#39;)"><div class="check-box" id="cb-drohnenrahmen"></div><span class="check-label">Drohnenrahmen gegeben</span></div>
+      </div>
+    </div>
+    <div class="form-divider"></div>
+    <div class="form-section">Stärke &amp; Gesundheit</div>
+    <div class="form-row"><label class="form-label">Futtervorrat</label><div class="futter-group"><button class="futter-btn" onclick="setFutter(&#39;minus&#39;)">− Wenig</button><button class="futter-btn" onclick="setFutter(&#39;null&#39;)">0 Mittel</button><button class="futter-btn" onclick="setFutter(&#39;plus&#39;)">+ Viel</button></div></div>
+    <div class="form-row"><label class="form-label label-bienen">🐝 Bienenmenge (besetzte Waben)</label><input class="form-input input-bienen" type="number" id="insp-bienen" placeholder="z.B. 8" min="0" max="30"><div class="input-hint">Anzahl der von Bienen besetzten Waben</div></div>
+    <div class="form-row"><label class="form-label label-varroa">🪲 Varroa-Befall (Milben pro Tag)</label><input class="form-input input-varroa" type="number" id="insp-varroa" placeholder="z.B. 3" min="0"><div class="input-hint">Natürlicher Totenfall über 24 h</div></div>
+    <div class="form-divider"></div>
+    <div class="form-row"><label class="form-label">Datum</label><input class="form-input" type="date" id="insp-datum"></div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal(&#39;modal-inspektion&#39;)">Abbrechen</button><button class="btn-primary" onclick="saveInspektion()">Speichern</button></div>
+  </div>
+</div>
+
+<!-- MODAL: VARROA -->
+<div class="modal-overlay" id="modal-varroa">
+  <div class="modal">
+    <div class="modal-title">💊 Varroa-Behandlung</div>
+    <div class="modal-subtitle" id="varroa-sub"></div>
+    <div class="multi-info" id="varroa-multi"></div>
+    <div class="form-row"><label class="form-label">Mittel</label><select class="form-input" id="varroa-mittel"><option>Oxalsäure (Verdampfung)</option><option>Oxalsäure (Träufelbehandlung)</option><option>Ameisensäure (Kurzzeitbehandlung)</option><option>Ameisensäure (Langzeitbehandlung)</option><option>Milchsäure</option><option>Apiguard</option><option>Thymovar</option><option>Andere</option></select></div>
+    <div class="row2">
+      <div class="form-row"><label class="form-label">Dosis</label><input class="form-input" id="varroa-dosis"></div>
+      <div class="form-row"><label class="form-label">Wiederholung</label><select class="form-input" id="varroa-wdh"><option>Einmalig</option><option>2×</option><option>3×</option></select></div>
+    </div>
+    <div class="form-row"><label class="form-label">Notiz</label><input class="form-input" id="varroa-notiz" placeholder="Optional"></div>
+    <div class="form-row"><label class="form-label">Datum</label><input class="form-input" type="date" id="varroa-datum"></div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal(&#39;modal-varroa&#39;)">Abbrechen</button><button class="btn-primary" onclick="saveVarroa()">Speichern</button></div>
+  </div>
+</div>
+
+<!-- MODAL: ERNTE -->
+<div class="modal-overlay" id="modal-ernte">
+  <div class="modal">
+    <div class="modal-title">🍯 Honigernte</div>
+    <div class="modal-subtitle" id="ernte-sub"></div>
+    <div class="multi-info" id="ernte-multi"></div>
+    <div class="row2">
+      <div class="form-row"><label class="form-label">Menge (kg)</label><input class="form-input" type="number" id="ernte-menge" placeholder="z.B. 8,5" step="0.1"></div>
+      <div class="form-row"><label class="form-label">Sorte</label><select class="form-input" id="ernte-sorte"><option>Blüte</option><option>Wald</option><option>Akazie</option><option>Raps</option><option>Linde</option><option>Buchweizen</option><option>Gemischt</option><option>Andere</option></select></div>
+    </div>
+    <div class="form-row"><label class="form-label">Notiz</label><input class="form-input" id="ernte-notiz" placeholder="Optional"></div>
+    <div class="form-row"><label class="form-label">Datum</label><input class="form-input" type="date" id="ernte-datum"></div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal(&#39;modal-ernte&#39;)">Abbrechen</button><button class="btn-primary" onclick="saveErnte()">Speichern</button></div>
+  </div>
+</div>
+
+<!-- MODAL: FÜTTERUNG -->
+<div class="modal-overlay" id="modal-fuetterung">
+  <div class="modal">
+    <div class="modal-title">🥣 Fütterung</div>
+    <div class="modal-subtitle" id="fuet-sub"></div>
+    <div class="multi-info" id="fuet-multi"></div>
+    <div class="row2">
+      <div class="form-row"><label class="form-label">Futtermittel</label><select class="form-input" id="fuet-art"><option>Weizenstärkesirup</option><option>Zuckerrübensirup</option><option>Zuckerlösung (1:1)</option><option>Zuckerlösung (2:1)</option><option>Futterteig</option><option>Futterwabe</option><option>Invertzucker</option><option>Andere</option></select></div>
+      <div class="form-row"><label class="form-label">Menge</label><input class="form-input" id="fuet-menge"></div>
+    </div>
+    <div class="form-row"><label class="form-label">Notiz</label><input class="form-input" id="fuet-notiz" placeholder="Optional"></div>
+    <div class="form-row"><label class="form-label">Datum</label><input class="form-input" type="date" id="fuet-datum"></div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal(&#39;modal-fuetterung&#39;)">Abbrechen</button><button class="btn-primary" onclick="saveFuetterung()">Speichern</button></div>
+  </div>
+</div>
+
+<!-- MODAL: AUFGABE -->
+<div class="modal-overlay" id="modal-aufgabe">
+  <div class="modal">
+    <div class="modal-title">✓ Neue Aufgabe</div>
+    <div class="modal-subtitle" id="auf-sub"></div>
+    <div class="multi-info" id="auf-multi"></div>
+    <div class="form-row"><label class="form-label">Aufgabe</label><input class="form-input" id="a-text" placeholder="Was muss getan werden?"></div>
+    <div class="row2">
+      <div class="form-row"><label class="form-label">Volk</label><select class="form-input" id="a-volk"><option value="">Allgemein</option></select></div>
+      <div class="form-row"><label class="form-label">Fällig am</label><input class="form-input" type="date" id="a-datum"></div>
+    </div>
+    <div class="form-row"><div class="urgent-toggle" id="urgent-toggle" onclick="togUrgent()"><div class="urgent-dot"></div><span class="urgent-lbl">Als dringend markieren</span></div></div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal(&#39;modal-aufgabe&#39;)">Abbrechen</button><button class="btn-primary" onclick="saveAufgabe()">Speichern</button></div>
+  </div>
+</div>
+
+<!-- MODAL: STANDORT HINZUFÜGEN -->
+<div class="modal-overlay" id="modal-addstandort">
+  <div class="modal">
+    <div class="modal-title">Neuer Standort</div>
+    <div class="form-row"><label class="form-label">Name des Standorts</label><input class="form-input" id="s-name" placeholder="z.B. Garten, Waldwiese…"></div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal(&#39;modal-addstandort&#39;)">Abbrechen</button><button class="btn-primary" onclick="saveStandort()">Speichern</button></div>
+  </div>
+</div>
+
+<!-- MODAL: VOLK HINZUFÜGEN -->
+<div class="modal-overlay" id="modal-addvolk">
+  <div class="modal">
+    <div class="modal-title">Neues Volk</div>
+    <div class="modal-subtitle" id="addvolk-sub"></div>
+    <input type="hidden" id="v-ort">
+    <div class="form-row"><label class="form-label">Name</label><input class="form-input" id="v-name" placeholder="z.B. Lieselotte"></div>
+    <div class="row2">
+      <div class="form-row"><label class="form-label">Beute</label><select class="form-input" id="v-beute"><option>Zander</option><option>Dadant</option><option>Langstroth</option><option>Warré</option><option>Andere</option></select></div>
+      <div class="form-row"><label class="form-label">Status</label><select class="form-input" id="v-status"><option>Gut</option><option>Beobachten</option><option>Kritisch</option></select></div>
+    </div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal(&#39;modal-addvolk&#39;)">Abbrechen</button><button class="btn-primary" onclick="saveVolk()">Speichern</button></div>
+  </div>
+</div>
+
+<!-- MODAL: VERSCHIEBEN -->
+<div class="modal-overlay" id="modal-verschieben">
+  <div class="modal">
+    <div class="modal-title">📦 Völker verschieben</div>
+    <div class="modal-subtitle" id="vers-sub"></div>
+    <div class="form-row"><label class="form-label">Bestehender Standort</label><select class="form-input" id="vers-ziel"></select></div>
+    <div class="form-row"><label class="form-label">Oder neuen Standort eingeben</label><input class="form-input" id="vers-neu" placeholder="Neuer Standortname…"></div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal(&#39;modal-verschieben&#39;)">Abbrechen</button><button class="btn-primary" onclick="saveVerschieben()">Verschieben</button></div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, doc, onSnapshot, addDoc, setDoc, deleteDoc, updateDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCarmtDfnnMwbQJdo2Ikr4jcgckGTkppLY",
+  authDomain: "buzz-1ed32.firebaseapp.com",
+  projectId: "buzz-1ed32",
+  storageBucket: "buzz-1ed32.firebasestorage.app",
+  messagingSenderId: "1063921787528",
+  appId: "1:1063921787528:web:6f3c587aafc824fae7b53d",
+  measurementId: "G-9TE64EGP0Y"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ---- STATE ----
+let voelker = [];
+let aufgaben = [];
+let eintraege = [];
+let activeStandort = null;
+let singleVolkId = null;
+let pendingIds = [];
+let activeFilter = 'alle';
+let isUrgent = false;
+let selectMode = false;
+let selectedIds = new Set();
+let longPressTimer = null;
+let inspState = {};
+let standorteListe = [];
+
+// ---- SYNC STATUS ----
+function setSyncStatus(state) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  const bar = document.getElementById('sync-bar');
+  if (state === 'syncing') { dot.className='sync-dot'; lbl.textContent='Synchronisiert…'; bar.className='syncing'; }
+  else if (state === 'ok') { dot.className='sync-dot'; lbl.textContent='Verbunden'; bar.className='done'; setTimeout(()=>bar.className='',600); }
+  else if (state === 'offline') { dot.className='sync-dot offline'; lbl.textContent='Offline'; }
+}
+
+// ---- FIREBASE LISTENERS ----
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+}
+
+function startListeners() {
+  let loaded = 0;
+  const total = 4;
+  function checkLoaded() { loaded++; if(loaded >= total) hideLoading(); }
+
+  // Fallback: nach 8 Sekunden Loading-Screen weg, auch wenn Fehler
+  setTimeout(() => {
+    hideLoading();
+    if(loaded === 0) setSyncStatus('offline');
+  }, 8000);
+
+  // Nach 4 Sekunden Hinweis auf mögliche Regel-Probleme
+  setTimeout(() => {
+    if(loaded === 0) {
+      document.getElementById('loading-msg').textContent = 'Verbindung dauert länger…';
+      document.getElementById('loading-hint').style.display = 'block';
+    }
+  }, 4000);
+
+  onSnapshot(collection(db,'standorte'), snap => {
+    standorteListe = snap.docs.map(d=>d.data().name);
+    checkLoaded();
+    renderAll();
+  }, err => { console.error('standorte',err); checkLoaded(); setSyncStatus('offline'); });
+
+  onSnapshot(collection(db,'voelker'), snap => {
+    voelker = snap.docs.map(d=>({id:d.id,...d.data()}));
+    checkLoaded();
+    setSyncStatus('ok');
+    renderAll();
+  }, err => { console.error('voelker',err); checkLoaded(); setSyncStatus('offline'); });
+
+  onSnapshot(collection(db,'aufgaben'), snap => {
+    aufgaben = snap.docs.map(d=>({id:d.id,...d.data()}));
+    checkLoaded();
+    renderAufgaben();
+  }, err => { console.error('aufgaben',err); checkLoaded(); });
+
+  onSnapshot(collection(db,'eintraege'), snap => {
+    eintraege = snap.docs.map(d=>({id:d.id,...d.data()}));
+    checkLoaded();
+    if (activeStandort) renderVoelkerList();
+  }, err => { console.error('eintraege',err); checkLoaded(); });
+}
+
+// ---- HELPERS ----
+function vn(id){const v=voelker.find(v=>v.id===id);return v?v.name:'';}
+function vo(id){const v=voelker.find(v=>v.id===id);return v?v.ort:'';}
+function today(){return new Date().toISOString().split('T')[0];}
+function alpha(arr,k){return[...arr].sort((a,b)=>(a[k]||'').localeCompare(b[k]||'','de'));}
+function standorteMap(){const m={};voelker.forEach(v=>{if(!m[v.ort])m[v.ort]=[];m[v.ort].push(v);});return m;}
+function alleStandorte(){return Object.keys(standorteMap()).sort((a,b)=>a.localeCompare(b,'de'));}
+function typeLabel(t){return{inspektion:'🔍 Inspektion',varroa:'💊 Behandlung',ernte:'🍯 Ernte',fuetterung:'🥣 Fütterung'}[t]||t;}
+function setMulti(elId,ids){const el=document.getElementById(elId);if(ids.length>1){el.style.display='block';el.textContent=`Wird für ${ids.length} Völker eingetragen: ${ids.map(vn).join(', ')}`;}else{el.style.display='none';}}
+
+// ---- TABS ----
+window.showTab = (name,btn) => {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='voelker') showStandortList();
+  renderAll();
+};
+
+// ---- STANDORTE ----
+window.showStandortList = () => {
+  activeStandort=null;
+  document.getElementById('view-standorte').style.display='';
+  document.getElementById('view-detail').style.display='none';
+  renderStandorte();
+};
+
+window.showStandortDetail = (ort) => {
+  activeStandort=ort;
+  document.getElementById('view-standorte').style.display='none';
+  document.getElementById('view-detail').style.display='';
+  document.getElementById('bc-name').textContent=ort;
+  renderVoelkerList();
+};
+
+function renderStandorte() {
+  const el=document.getElementById('standorte-list');
+  const offene=aufgaben.filter(a=>!a.done);
+  const total=voelker.length;
+
+  // Alle bekannten Standorte: aus Völkern + aus eigener Standort-Collection
+  const ortAusVoelkern=alleStandorte();
+  const alleOrte=[...new Set([...standorteListe,...ortAusVoelkern])].sort((a,b)=>a.localeCompare(b,'de'));
+
+  document.getElementById('subtitle').textContent=`${total} Volk${total!==1?'er':''} · ${alleOrte.length} Standort${alleOrte.length!==1?'e':''}`;
+  document.getElementById('standorte-title').textContent=`Standorte (${alleOrte.length})`;
+  if(!alleOrte.length){el.innerHTML='<div class="empty-state">Noch keine Standorte angelegt.<br><br>Tippe auf „+ Standort" um loszulegen.</div>';return;}
+  const emojis=['🌿','🌲','🌼','🏡','🌳','🍀','🌻','🌾'];
+  const map=standorteMap();
+  el.innerHTML=alleOrte.map((ort,i)=>{
+    const vv=map[ort]||[];
+    const kritisch=vv.filter(v=>v.status==='Kritisch').length;
+    const beob=vv.filter(v=>v.status==='Beobachten').length;
+    const auf=offene.filter(a=>vv.some(v=>v.id===a.volkId)).length;
+    const dring=offene.filter(a=>a.dringend&&vv.some(v=>v.id===a.volkId)).length;
+    const badge=vv.length===0?'':kritisch?'<span class="badge badge-danger">'+kritisch+' kritisch</span>':beob?'<span class="badge badge-warn">'+beob+' beobachten</span>':'<span class="badge badge-ok">Alle gut</span>';
+    const meta=vv.length?(vv.length+' Volk'+(vv.length!==1?'er':'')+(auf?' · '+auf+' Aufgabe'+(auf>1?'n':''):'')+(dring?' · <span style="color:var(--red);font-weight:600;">'+dring+' dringend</span>':'')):'Noch keine Völker';
+    const ortSafe=ort.replace(/'/g,"\\'");
+    return '<div class="standort-card" style="cursor:default;">'
+      +'<div class="standort-left" style="cursor:pointer;flex:1;" onclick="showStandortDetail(\''+ortSafe+'\')">'
+      +'<div class="standort-icon">'+emojis[i%emojis.length]+'</div>'
+      +'<div>'
+      +'<div class="standort-name">'+ort+'</div>'
+      +'<div class="standort-meta">'+meta+'</div>'
+      +(badge?'<div style="margin-top:6px;">'+badge+'</div>':'')
+      +'</div></div>'
+      +'<div style="display:flex;align-items:center;gap:10px;">'
+      +'<span style="color:var(--text2);font-size:18px;cursor:pointer;" onclick="showStandortDetail(\''+ortSafe+'\')">›</span>'
+      +'<button class="btn-sm" style="color:#C0392B;border-color:#FFCDD2;font-size:13px;padding:5px 8px;" onclick="deleteStandort(\''+ortSafe+'\',event)">🗑</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+function renderVoelkerList() {
+  const el=document.getElementById('voelker-list');
+  const vv=alpha(voelker.filter(v=>v.ort===activeStandort),'name');
+  const offene=aufgaben.filter(a=>!a.done);
+  document.getElementById('detail-title').textContent=`${activeStandort} (${vv.length})`;
+  if(!vv.length){el.innerHTML='<div class="empty-state">Keine Völker hier.</div>';return;}
+  el.innerHTML=vv.map(v=>{
+    const auf=offene.filter(a=>a.volkId===v.id).length;
+    const dring=offene.filter(a=>a.dringend&&a.volkId===v.id).length;
+    const badge=v.status==='Gut'?'badge-ok':v.status==='Beobachten'?'badge-warn':'badge-danger';
+    const letzter=eintraege.filter(e=>e.volkId===v.id).sort((a,b)=>(b.datum||'').localeCompare(a.datum||''))[0];
+    const letzterTxt=letzter?`${typeLabel(letzter.typ)} · ${letzter.datum}`:'Noch kein Eintrag';
+    const sel=selectMode&&selectedIds.has(v.id);
+    return `<div class="hive-row ${selectMode?'select-mode':''} ${sel?'selected':''}" id="hr-${v.id}" data-id="${v.id}">
+      <div class="select-circle"></div>
+      <div style="font-size:22px;">🐝</div>
+      <div class="hive-info">
+        <div class="hive-name">${v.name}${dring?` <span class="badge badge-urgent">!</span>`:''}</div>
+        <div class="hive-sub">${v.beute} · ${letzterTxt}${auf?` · <span style="color:var(--orange);">${auf} Aufgabe${auf>1?'n':''}</span>`:''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="badge ${badge}">${v.status}</span><span style="color:var(--text2);font-size:18px;">›</span></div>
+    </div>`;
+  }).join('');
+
+  // Events
+  vv.forEach(v=>{
+    const row=document.getElementById('hr-'+v.id);
+    row.addEventListener('pointerdown',()=>{longPressTimer=setTimeout(()=>{longPressTimer=null;if(!selectMode)enterSelect(v.id);},480);});
+    row.addEventListener('pointerup',()=>clearTimeout(longPressTimer));
+    row.addEventListener('pointercancel',()=>clearTimeout(longPressTimer));
+    row.addEventListener('pointermove',()=>clearTimeout(longPressTimer));
+    row.addEventListener('click',()=>{if(selectMode){togSelect(v.id);return;}singleVolkId=v.id;openSheet(v.id);});
+  });
+}
+
+// ---- MEHRFACHAUSWAHL ----
+function enterSelect(id){selectMode=true;selectedIds=new Set([id]);updateSelUI();}
+window.cancelSelect=()=>{selectMode=false;selectedIds=new Set();updateSelUI();renderVoelkerList();};
+function togSelect(id){if(selectedIds.has(id))selectedIds.delete(id);else selectedIds.add(id);if(!selectedIds.size){cancelSelect();return;}updateSelUI();renderVoelkerList();}
+function updateSelUI(){
+  const n=selectedIds.size;
+  document.getElementById('sel-banner').classList.toggle('show',selectMode);
+  document.getElementById('mass-bar').classList.toggle('show',selectMode);
+  document.getElementById('sel-count').textContent=`${n} Volk${n!==1?'er':''} ausgewählt`;
+}
+window.massAction=(typ)=>{const ids=[...selectedIds];cancelSelect();setTimeout(()=>openForm(typ,ids),100);};
+
+// ---- EINZEL-SHEET ----
+window.openSheet=(volkId)=>{
+  singleVolkId=volkId;
+  const v=voelker.find(v=>v.id===volkId);
+  document.getElementById('sheet-title').textContent=v?`🐝 ${v.name} · ${v.ort}`:'';
+  document.getElementById('sheet-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('action-sheet').classList.add('open'),10);
+};
+window.closeSheet=()=>{document.getElementById('action-sheet').classList.remove('open');document.getElementById('sheet-overlay').classList.remove('open');};
+window.sheetDo=(typ)=>{closeSheet();if(typ==='loeschen'){setTimeout(async()=>{if(confirm('Volk wirklich entfernen?')){await deleteDoc(doc(db,'voelker',singleVolkId));const rest=voelker.filter(v=>v.ort===activeStandort&&v.id!==singleVolkId);if(!rest.length)showStandortList();}},200);return;}setTimeout(()=>openForm(typ,[singleVolkId]),250);};
+
+// ---- FORMULARE ----
+function resetInsp(){
+  inspState={koenigin:null,stifte:null,weisel:null,weiselv:null,drohne:null,futter:null,honigraum:false,brutraum:false,drohnenrahmen:false};
+  ['koenigin','stifte','weisel','weiselv','drohne'].forEach(k=>document.querySelectorAll(`#tg-${k} .toggle-btn`).forEach(b=>b.classList.remove('active-ja','active-nein')));
+  document.querySelectorAll('.futter-btn').forEach(b=>b.classList.remove('active-minus','active-null','active-plus'));
+  ['honigraum','brutraum','drohnenrahmen'].forEach(k=>document.getElementById('cb-'+k).classList.remove('checked'));
+  document.getElementById('weisel-detail').classList.remove('show');
+  document.getElementById('insp-bienen').value='';
+  document.getElementById('insp-varroa').value='';
+}
+window.tog=(key,val)=>{
+  inspState[key]=val;
+  document.querySelectorAll(`#tg-${key} .toggle-btn`).forEach(b=>b.classList.remove('active-ja','active-nein'));
+  document.querySelector(`#tg-${key} .toggle-btn:nth-child(${val==='ja'?1:2})`).classList.add(`active-${val}`);
+  if(key==='weisel'){document.getElementById('weisel-detail').classList.toggle('show',val==='ja');if(val==='nein'){inspState.weiselv=null;document.querySelectorAll('#tg-weiselv .toggle-btn').forEach(b=>b.classList.remove('active-ja','active-nein'));}}
+};
+window.setFutter=(val)=>{inspState.futter=val;document.querySelectorAll('.futter-btn').forEach(b=>b.classList.remove('active-minus','active-null','active-plus'));document.querySelectorAll('.futter-btn')[val==='minus'?0:val==='null'?1:2].classList.add('active-'+val);};
+window.togCb=(key)=>{inspState[key]=!inspState[key];document.getElementById('cb-'+key).classList.toggle('checked',inspState[key]);};
+window.togUrgent=()=>{isUrgent=!isUrgent;document.getElementById('urgent-toggle').classList.toggle('active',isUrgent);};
+
+function openForm(typ,ids){
+  pendingIds=ids;
+  const isMass=ids.length>1;
+  const v=voelker.find(v=>v.id===ids[0]);
+  const sub=isMass?'':(v?`${v.name} · ${v.ort}`:'');
+
+  if(typ==='inspektion'){
+    document.getElementById('insp-sub').textContent=sub;setMulti('insp-multi',ids);
+    document.getElementById('insp-datum').value=today();resetInsp();openModal('modal-inspektion');
+  } else if(typ==='varroa'){
+    document.getElementById('varroa-sub').textContent=sub;setMulti('varroa-multi',ids);
+    document.getElementById('varroa-datum').value=today();document.getElementById('varroa-mittel').value='Oxalsäure (Verdampfung)';document.getElementById('varroa-dosis').value='2 mg';document.getElementById('varroa-notiz').value='';openModal('modal-varroa');
+  } else if(typ==='ernte'){
+    document.getElementById('ernte-sub').textContent=sub;setMulti('ernte-multi',ids);
+    document.getElementById('ernte-datum').value=today();document.getElementById('ernte-menge').value='';document.getElementById('ernte-notiz').value='';openModal('modal-ernte');
+  } else if(typ==='fuetterung'){
+    document.getElementById('fuet-sub').textContent=sub;setMulti('fuet-multi',ids);
+    document.getElementById('fuet-datum').value=today();document.getElementById('fuet-art').value='Weizenstärkesirup';document.getElementById('fuet-menge').value='5 Liter';document.getElementById('fuet-notiz').value='';openModal('modal-fuetterung');
+  } else if(typ==='aufgabe'){
+    openAufgabeModal(ids);
+  } else if(typ==='verschieben'){
+    const names=ids.map(vn).join(', ');
+    document.getElementById('vers-sub').textContent=`${ids.length} Volk${ids.length!==1?'er':''}: ${names}`;
+    const curOrts=[...new Set(ids.map(id=>vo(id)))];
+    const andere=alleStandorte().filter(o=>!curOrts.includes(o));
+    const sel=document.getElementById('vers-ziel');
+    sel.innerHTML=andere.length?andere.map(o=>`<option>${o}</option>`).join(''):'<option>– Kein anderer Standort –</option>';
+    document.getElementById('vers-neu').value='';openModal('modal-verschieben');
+  }
+}
+
+window.openAufgabeModal=(ids)=>{
+  pendingIds=ids;
+  const isMass=ids.length>1;
+  const v=voelker.find(v=>v.id===ids[0]);
+  document.getElementById('auf-sub').textContent=isMass?'':(v?`${v.name} · ${v.ort}`:'');
+  setMulti('auf-multi',ids);
+  const sel=document.getElementById('a-volk');
+  sel.innerHTML='<option value="">Allgemein</option>';
+  alpha(voelker,'name').forEach(vv=>{const o=document.createElement('option');o.value=vv.id;o.textContent=`${vv.name} (${vv.ort})`;sel.appendChild(o);});
+  if(!isMass&&ids[0])sel.value=ids[0];
+  document.getElementById('a-datum').value=today();document.getElementById('a-text').value='';
+  isUrgent=false;document.getElementById('urgent-toggle').classList.remove('active');
+  openModal('modal-aufgabe');
+};
+
+// ---- SPEICHERN ----
+window.saveInspektion=async()=>{
+  setSyncStatus('syncing');
+  for(const volkId of pendingIds){
+    await addDoc(collection(db,'eintraege'),{volkId,typ:'inspektion',datum:document.getElementById('insp-datum').value,...inspState,bienen:document.getElementById('insp-bienen').value,varroa:document.getElementById('insp-varroa').value,ts:serverTimestamp()});
+  }
+  setSyncStatus('ok');closeModal('modal-inspektion');
+};
+window.saveVarroa=async()=>{
+  setSyncStatus('syncing');
+  for(const volkId of pendingIds){await addDoc(collection(db,'eintraege'),{volkId,typ:'varroa',datum:document.getElementById('varroa-datum').value,mittel:document.getElementById('varroa-mittel').value,dosis:document.getElementById('varroa-dosis').value,wdh:document.getElementById('varroa-wdh').value,notiz:document.getElementById('varroa-notiz').value,ts:serverTimestamp()});}
+  setSyncStatus('ok');closeModal('modal-varroa');
+};
+window.saveErnte=async()=>{
+  setSyncStatus('syncing');
+  for(const volkId of pendingIds){await addDoc(collection(db,'eintraege'),{volkId,typ:'ernte',datum:document.getElementById('ernte-datum').value,menge:document.getElementById('ernte-menge').value,sorte:document.getElementById('ernte-sorte').value,notiz:document.getElementById('ernte-notiz').value,ts:serverTimestamp()});}
+  setSyncStatus('ok');closeModal('modal-ernte');
+};
+window.saveFuetterung=async()=>{
+  setSyncStatus('syncing');
+  for(const volkId of pendingIds){await addDoc(collection(db,'eintraege'),{volkId,typ:'fuetterung',datum:document.getElementById('fuet-datum').value,art:document.getElementById('fuet-art').value,menge:document.getElementById('fuet-menge').value,notiz:document.getElementById('fuet-notiz').value,ts:serverTimestamp()});}
+  setSyncStatus('ok');closeModal('modal-fuetterung');
+};
+window.saveAufgabe=async()=>{
+  const text=document.getElementById('a-text').value.trim();if(!text)return;
+  setSyncStatus('syncing');
+  const datum=document.getElementById('a-datum').value;
+  if(pendingIds.length>1){
+    for(const volkId of pendingIds){await addDoc(collection(db,'aufgaben'),{text,volkId,datum,done:false,dringend:isUrgent,ts:serverTimestamp()});}
+  } else {
+    const v=document.getElementById('a-volk').value;
+    await addDoc(collection(db,'aufgaben'),{text,volkId:v||'',datum,done:false,dringend:isUrgent,ts:serverTimestamp()});
+  }
+  setSyncStatus('ok');closeModal('modal-aufgabe');
+};
+window.saveStandort=async()=>{
+  const name=document.getElementById('s-name').value.trim();if(!name)return;
+  setSyncStatus('syncing');
+  await setDoc(doc(db,'standorte',name),{name,ts:serverTimestamp()});
+  setSyncStatus('ok');closeModal('modal-addstandort');
+  document.getElementById('s-name').value='';
+};
+
+window.deleteStandort=async(ort,e)=>{
+  e.stopPropagation();
+  const vv=voelker.filter(v=>v.ort===ort);
+  const msg=vv.length?`„${ort}" hat noch ${vv.length} Volk${vv.length!==1?'er':''}. Trotzdem löschen?`:`Standort „${ort}" wirklich löschen?`;
+  if(!confirm(msg))return;
+  setSyncStatus('syncing');
+  await deleteDoc(doc(db,'standorte',ort));
+  setSyncStatus('ok');
+};
+
+window.saveVolk=async()=>{
+  const name=document.getElementById('v-name').value.trim();if(!name)return;
+  const ort=document.getElementById('v-ort').value.trim()||'Unbekannt';
+  setSyncStatus('syncing');
+  await addDoc(collection(db,'voelker'),{name,ort,beute:document.getElementById('v-beute').value,status:document.getElementById('v-status').value,ts:serverTimestamp()});
+  setSyncStatus('ok');closeModal('modal-addvolk');
+  activeStandort=ort;showStandortDetail(ort);
+};
+window.saveVerschieben=async()=>{
+  const neu=document.getElementById('vers-neu').value.trim();
+  const ziel=neu||document.getElementById('vers-ziel').value;
+  if(!ziel)return;
+  setSyncStatus('syncing');
+  for(const id of pendingIds){await updateDoc(doc(db,'voelker',id),{ort:ziel});}
+  setSyncStatus('ok');closeModal('modal-verschieben');
+  const rest=voelker.filter(v=>v.ort===activeStandort&&!pendingIds.includes(v.id));
+  if(!rest.length)showStandortList();
+};
+
+// ---- AUFGABEN ----
+window.toggleAuf=async(id,done)=>{setSyncStatus('syncing');await updateDoc(doc(db,'aufgaben',id),{done:!done});setSyncStatus('ok');};
+window.deleteAuf=async(id)=>{setSyncStatus('syncing');await deleteDoc(doc(db,'aufgaben',id));setSyncStatus('ok');};
+
+function renderAufgaben(){
+  renderFilterBar();
+  const el=document.getElementById('aufgaben-list');
+  const t=today();const soon=new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+  let list=aufgaben;
+  if(activeFilter!=='alle'){const ids=voelker.filter(v=>v.ort===activeFilter).map(v=>v.id);list=list.filter(a=>ids.includes(a.volkId)||!a.volkId);}
+  const od=list.filter(a=>!a.done&&a.dringend).sort((a,b)=>(a.datum||'9').localeCompare(b.datum||'9'));
+  const on=list.filter(a=>!a.done&&!a.dringend).sort((a,b)=>(a.datum||'9').localeCompare(b.datum||'9'));
+  const dn=list.filter(a=>a.done);
+  document.getElementById('aufgaben-title').textContent=`Aufgaben${(od.length+on.length)?` (${od.length+on.length} offen)`:''}`;
+  if(!list.length){el.innerHTML='<div class="empty-state">Keine Aufgaben vorhanden.</div>';return;}
+  const rt=(a)=>{let dc='due-ok',dl=a.datum;if(a.datum&&!a.done){if(a.datum<t){dc='due-over';dl='Überfällig: '+a.datum;}else if(a.datum<=soon)dc='due-soon';}const name=a.volkId?vn(a.volkId):'';const ort=a.volkId?vo(a.volkId):'';return`<div class="task-item ${a.dringend&&!a.done?'urgent-stripe':''}"><div class="task-check ${a.done?'done':''}" onclick="toggleAuf('${a.id}',${a.done})"></div><div class="task-body"><div class="task-text ${a.done?'done':''}">${a.dringend&&!a.done?'<span class="badge badge-urgent" style="margin-right:5px;">!</span>':''}${a.text}</div><div class="task-meta">${name?`<span>🐝 ${name}</span>`:''}${ort?`<span>📍 ${ort}</span>`:''}${a.datum?`<span class="due-pill ${a.done?'':dc}">${dl}</span>`:''}</div></div><button class="btn-sm" onclick="deleteAuf('${a.id}')">✕</button></div>`;};
+  let html='';
+  if(od.length)html+=`<div class="task-group-label">🔴 Dringend</div>`+od.map(rt).join('');
+  if(on.length){if(od.length)html+=`<div style="height:8px;"></div>`;html+=`<div class="task-group-label">Offen</div>`+on.map(rt).join('');}
+  if(dn.length)html+=`<div style="height:8px;"></div><div class="task-group-label">Erledigt</div>`+dn.map(rt).join('');
+  el.innerHTML=html;
+}
+
+function renderFilterBar(){
+  const bar=document.getElementById('filter-bar');
+  const orte=alleStandorte();
+  bar.innerHTML=`<button class="filter-chip ${activeFilter==='alle'?'active':''}" onclick="setFilter('alle')">Alle</button>`+orte.map(o=>`<button class="filter-chip ${activeFilter===o?'active':''}" onclick="setFilter('${o.replace(/'/g,"\\'")}')">${o}</button>`).join('');
+}
+window.setFilter=(v)=>{activeFilter=v;renderFilterBar();renderAufgaben();};
+
+// ---- MODAL HELPERS ----
+window.openModal=(id)=>document.getElementById(id).classList.add('open');
+window.closeModal=(id)=>document.getElementById(id).classList.remove('open');
+window.openAddVolkHere=()=>{
+  document.getElementById('v-name').value='';
+  document.getElementById('v-ort').value=activeStandort||'';
+  document.getElementById('addvolk-sub').textContent=`Standort: ${activeStandort}`;
+  openModal('modal-addvolk');
+};
+
+function renderAll(){if(activeStandort)renderVoelkerList();else renderStandorte();renderAufgaben();}
+
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// Start
+startListeners();
+</script>
+
+
+</body></html>
